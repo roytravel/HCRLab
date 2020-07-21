@@ -1,5 +1,6 @@
+# -*- encoding: utf-8 -*-
 import json
-
+import os
 
 #----------------------------------------------------------------------------
 # ID, Description, CVSSv2_Vector, CVSSv2_Score, CVSSv2_Exploitability_Score, 
@@ -28,20 +29,15 @@ def read_sql(path_sql):
 
 # 기존 SQL 파일 데이터에 Add를 위한 데이터 로딩
 def update_sql(path_sql, bquery):
-    with open(path_sql, mode='a+') as f:
-        f.write(bquery)
-        f.write('\n')
+    with open(path_sql, 'a+', -1, 'utf-8') as f:
+        try:
+            f.write(bquery)
+            f.write('\n')
+        except Exception as err:
+            print (err)
 
     return update_sql
 
-# # 테스트
-# def update_test_sql(path_sql, bquery):
-#     path_sql = "C:/Users/Cyber/Desktop/test.sql"
-#     with open(path_sql, mode='a+') as f:
-#         f.write(bquery)
-#         f.write('\n')
-
-#     return update_sql
 
 # 로딩된 JSON 파일을 받아서 파싱 & 파싱 데이터를 SQL 포맷화
 def parse_json(data_json, idx):
@@ -82,10 +78,10 @@ def parse_json(data_json, idx):
         return False
 
 
-
 if __name__ == '__main__':
-    path_json = "C:/Users/Cyber/Desktop/nvdcve-1.1-2018.json"
-    path_sql = 'C:/Users/Cyber/Desktop/NSR/ADD_Attack-Graph-master/DB/ADD_Vulnerability_DB/Vulnerability_DB_CVE_Basic.sql'
+    USER_PATH = os.environ.get('USER_PATH')
+    path_json = USER_PATH + "/nvdcve-1.1-2020.json"
+    path_sql = USER_PATH + '/Vulnerability_DB_CVE_Basic.sql'
 
     data_json = read_json(path_json)
     data_sql = read_sql(path_sql)
@@ -98,7 +94,7 @@ if __name__ == '__main__':
 
             # 만약 CVE가 바이너리에 매칭될 경우 CVE 번호만 출력
             if (bquery[:394] in data_sql):
-                print (data_json['CVE_Items'][idx]['cve']['CVE_data_meta']['ID'])
+                print (data_json['CVE_Items'][idx]['cve']['CVE_data_meta']['ID'] + ' is already exist')
             
             # CVE 번호가 존재하지 않는다면 SQL 파일의 끝 부분에 업데이트
             else:
@@ -114,7 +110,9 @@ if __name__ == '__main__':
     print (deprecated_list)
     print ("Deprecated CVE Count : {}".format(len(deprecated_list)))
 
-    # with open('C:/Users/Cyber/Desktop/deprecated_cve.txt', 'a+') as d:
-    #     for j in range(len(deprecated_list)):
-    #         d.write(deprecated_list[j])
-    #         d.write('\n')
+    with open(USER_PATH + '/deprecated_cve.txt', 'a+') as d:
+        for j in range(len(deprecated_list)):
+            d.write(deprecated_list[j])
+            d.write('\n')
+
+    
