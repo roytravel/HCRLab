@@ -36,8 +36,6 @@ def update_sql(path_sql, bquery):
         except Exception as err:
             print (err)
 
-    return update_sql
-
 
 # 로딩된 JSON 파일을 받아서 파싱 & 파싱 데이터를 SQL 포맷화
 def parse_json(data_json, idx):
